@@ -1,0 +1,863 @@
+<title>ニュース日報</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Zen+Old+Mincho:wght@600;700;900&family=Zen+Kaku+Gothic+New:wght@400;500;700&family=Roboto+Mono:wght@400;500;700&display=swap">
+
+<style>
+  :root {
+    --ground: #eef2f6;
+    --paper: #ffffff;
+    --paper-2: #f6f9fb;
+    --ink: #16222e;
+    --ink-2: #3d4e5e;
+    --muted: #6b7c8c;
+    --rule: #d3dde5;
+    --rule-soft: #e3eaf0;
+    --accent: #1e3f77;
+    --accent-2: #35619e;
+    --accent-wash: #e7edf7;
+    --up: #10704a;
+    --down: #b23a2c;
+    --flat: #5d6f80;
+    --yes: #1d6b4f;
+    --yes-wash: #e2f0e9;
+    --no: #8a5a2b;
+    --no-wash: #f5ece1;
+    --shadow: 0 1px 2px rgba(22, 34, 46, .05), 0 8px 24px rgba(22, 34, 46, .06);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --ground: #0d151d;
+      --paper: #151f2a;
+      --paper-2: #1b2733;
+      --ink: #e6edf4;
+      --ink-2: #bcc9d6;
+      --muted: #8ea0b1;
+      --rule: #2a3945;
+      --rule-soft: #223039;
+      --accent: #8fb3e6;
+      --accent-2: #a8c5ef;
+      --accent-wash: #1c2a3c;
+      --up: #4ec08c;
+      --down: #ef7f6e;
+      --flat: #9aabbb;
+      --yes: #6fcfa2;
+      --yes-wash: #17302a;
+      --no: #d8a469;
+      --no-wash: #2e2519;
+      --shadow: 0 1px 2px rgba(0, 0, 0, .3), 0 8px 24px rgba(0, 0, 0, .28);
+    }
+  }
+
+  :root[data-theme="dark"] {
+    --ground: #0d151d;
+    --paper: #151f2a;
+    --paper-2: #1b2733;
+    --ink: #e6edf4;
+    --ink-2: #bcc9d6;
+    --muted: #8ea0b1;
+    --rule: #2a3945;
+    --rule-soft: #223039;
+    --accent: #8fb3e6;
+    --accent-2: #a8c5ef;
+    --accent-wash: #1c2a3c;
+    --up: #4ec08c;
+    --down: #ef7f6e;
+    --flat: #9aabbb;
+    --yes: #6fcfa2;
+    --yes-wash: #17302a;
+    --no: #d8a469;
+    --no-wash: #2e2519;
+    --shadow: 0 1px 2px rgba(0, 0, 0, .3), 0 8px 24px rgba(0, 0, 0, .28);
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    background: var(--ground);
+    color: var(--ink);
+    font-family: "Zen Kaku Gothic New", -apple-system, BlinkMacSystemFont, "Hiragino Sans", "Noto Sans JP", sans-serif;
+    font-size: 16px;
+    line-height: 1.5;
+    margin: 0;
+    -webkit-text-size-adjust: 100%;
+    overflow-x: hidden;
+  }
+
+  .wrap {
+    max-width: 42rem;
+    margin: 0 auto;
+    padding: 0.75rem 1.125rem 7rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.75rem;
+  }
+
+  .masthead {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid var(--accent);
+  }
+
+  .masthead h1 {
+    font-family: "Zen Old Mincho", "Hiragino Mincho ProN", "Yu Mincho", serif;
+    font-weight: 900;
+    font-size: clamp(1.625rem, 6.5vw, 2.125rem);
+    line-height: 1.15;
+    letter-spacing: 0.04em;
+    margin: 0;
+    text-wrap: balance;
+  }
+
+  .masthead .dateline {
+    font-family: "Roboto Mono", ui-monospace, monospace;
+    font-size: 0.8125rem;
+    color: var(--accent);
+    letter-spacing: 0.06em;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .masthead .period {
+    font-size: 0.8125rem;
+    color: var(--muted);
+    line-height: 1.6;
+  }
+
+  .market {
+    background: var(--paper);
+    border: 1px solid var(--rule);
+    border-radius: 10px;
+    box-shadow: var(--shadow);
+    overflow: hidden;
+  }
+
+  .market-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0.5rem;
+    padding: 0.75rem 1rem;
+    background: var(--accent-wash);
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .market-head .label {
+    font-family: "Roboto Mono", ui-monospace, monospace;
+    font-size: 0.6875rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--accent);
+    font-weight: 700;
+  }
+
+  .market-head .sub { font-size: 0.6875rem; color: var(--muted); }
+
+  .market-list { list-style: none; margin: 0; padding: 0; }
+
+  .market-list li {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid var(--rule-soft);
+  }
+
+  .market-list li:last-child { border-bottom: 0; }
+
+  .m-name {
+    font-family: "Zen Old Mincho", "Hiragino Mincho ProN", serif;
+    font-weight: 700;
+    font-size: 1rem;
+    line-height: 1.3;
+  }
+
+  .m-when {
+    display: block;
+    font-family: "Roboto Mono", ui-monospace, monospace;
+    font-size: 0.6875rem;
+    color: var(--muted);
+    letter-spacing: 0.03em;
+    margin-top: 0.125rem;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .m-vals { text-align: right; }
+
+  .m-close {
+    display: block;
+    font-family: "Roboto Mono", ui-monospace, monospace;
+    font-size: 1.0625rem;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.01em;
+    line-height: 1.2;
+  }
+
+  .m-chg {
+    display: block;
+    font-family: "Roboto Mono", ui-monospace, monospace;
+    font-size: 0.8125rem;
+    font-weight: 500;
+    font-variant-numeric: tabular-nums;
+    margin-top: 0.125rem;
+    line-height: 1.2;
+  }
+
+  .up { color: var(--up); }
+  .down { color: var(--down); }
+  .flat { color: var(--flat); }
+
+  .m-note {
+    padding: 0.75rem 1rem;
+    background: var(--paper-2);
+    border-top: 1px solid var(--rule-soft);
+    font-size: 0.75rem;
+    line-height: 1.65;
+    color: var(--muted);
+  }
+
+  .howto {
+    display: flex;
+    gap: 0.75rem;
+    align-items: flex-start;
+    padding: 0.75rem 0.875rem;
+    border-left: 3px solid var(--accent);
+    background: var(--paper-2);
+    border-radius: 0 8px 8px 0;
+    font-size: 0.8125rem;
+    line-height: 1.7;
+    color: var(--ink-2);
+  }
+
+  .howto b { font-weight: 700; color: var(--ink); }
+
+  .genre { display: flex; flex-direction: column; gap: 1.25rem; }
+
+  .genre-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0.75rem;
+    padding-bottom: 0.4375rem;
+    border-bottom: 1px solid var(--accent);
+  }
+
+  .genre-head h2 {
+    font-family: "Zen Old Mincho", "Hiragino Mincho ProN", serif;
+    font-weight: 700;
+    font-size: 1.1875rem;
+    letter-spacing: 0.04em;
+    margin: 0;
+    line-height: 1.3;
+  }
+
+  .genre-head .range {
+    font-family: "Roboto Mono", ui-monospace, monospace;
+    font-size: 0.75rem;
+    color: var(--muted);
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+
+  .art {
+    display: grid;
+    grid-template-columns: 1.75rem minmax(0, 1fr);
+    column-gap: 0.625rem;
+    row-gap: 0.375rem;
+  }
+
+  .art .num {
+    grid-column: 1;
+    grid-row: 1;
+    font-family: "Roboto Mono", ui-monospace, monospace;
+    font-size: 0.9375rem;
+    font-weight: 700;
+    color: var(--accent);
+    font-variant-numeric: tabular-nums;
+    padding-top: 0.1875rem;
+  }
+
+  .art h3 {
+    grid-column: 2;
+    grid-row: 1;
+    font-family: "Zen Old Mincho", "Hiragino Mincho ProN", serif;
+    font-weight: 700;
+    font-size: 1.0625rem;
+    line-height: 1.45;
+    margin: 0;
+  }
+
+  .art .body {
+    grid-column: 2;
+    grid-row: 2;
+    font-size: 0.9375rem;
+    line-height: 1.75;
+    color: var(--ink-2);
+    margin: 0;
+  }
+
+  .why {
+    grid-column: 2;
+    grid-row: 3;
+    display: flex;
+    gap: 0.5rem;
+    align-items: flex-start;
+    background: var(--accent-wash);
+    border-left: 3px solid var(--accent);
+    border-radius: 0 6px 6px 0;
+    padding: 0.5rem 0.75rem;
+  }
+
+  .why .label {
+    flex: none;
+    font-family: "Roboto Mono", ui-monospace, monospace;
+    font-size: 0.6875rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    color: var(--accent);
+    padding-top: 0.0625rem;
+    white-space: nowrap;
+  }
+
+  .why p {
+    margin: 0;
+    font-size: 0.875rem;
+    line-height: 1.65;
+    color: var(--ink);
+    font-weight: 500;
+  }
+
+  .art .foot {
+    grid-column: 2;
+    grid-row: 4;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 0.5rem 0.75rem;
+    margin-top: 0.25rem;
+  }
+
+  .art .src {
+    font-family: "Roboto Mono", ui-monospace, monospace;
+    font-size: 0.6875rem;
+    color: var(--muted);
+    letter-spacing: 0.02em;
+    font-variant-numeric: tabular-nums;
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+
+  .rate {
+    grid-column: 2;
+    grid-row: 5;
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+    padding-top: 0.125rem;
+  }
+
+  .rate .rl {
+    font-family: "Roboto Mono", ui-monospace, monospace;
+    font-size: 0.625rem;
+    letter-spacing: 0.1em;
+    color: var(--muted);
+    margin-right: auto;
+    font-weight: 700;
+  }
+
+  .rb {
+    font-family: "Zen Kaku Gothic New", sans-serif;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--muted);
+    background: transparent;
+    border: 1px solid var(--rule);
+    border-radius: 999px;
+    padding: 0.3125rem 0.75rem;
+    line-height: 1.4;
+    cursor: pointer;
+    transition: background .12s ease, color .12s ease, border-color .12s ease;
+  }
+
+  .rb[aria-pressed="true"][data-v="yes"] {
+    color: var(--yes);
+    background: var(--yes-wash);
+    border-color: var(--yes);
+  }
+
+  .rb[aria-pressed="true"][data-v="no"] {
+    color: var(--no);
+    background: var(--no-wash);
+    border-color: var(--no);
+  }
+
+  .dig {
+    flex: none;
+    display: inline-block;
+    font-family: "Zen Kaku Gothic New", sans-serif;
+    font-size: 0.6875rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    color: var(--accent);
+    background: var(--accent-wash);
+    border: 1px solid var(--rule);
+    border-radius: 999px;
+    padding: 0.3125rem 0.75rem;
+    line-height: 1.4;
+    cursor: pointer;
+    transition: background .12s ease, color .12s ease;
+  }
+
+  .dig:hover, .dig:focus-visible { background: var(--accent); color: var(--paper); }
+
+  :focus-visible { outline: 2px solid var(--accent-2); outline-offset: 2px; }
+
+  .closing {
+    background: var(--paper);
+    border: 1px solid var(--rule);
+    border-radius: 10px;
+    padding: 0.9375rem 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.625rem;
+  }
+
+  .closing h2 {
+    font-family: "Zen Old Mincho", "Hiragino Mincho ProN", serif;
+    font-size: 0.9375rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    margin: 0;
+  }
+
+  .closing p { margin: 0; font-size: 0.8125rem; line-height: 1.75; color: var(--ink-2); }
+
+  .closing .k {
+    font-family: "Roboto Mono", ui-monospace, monospace;
+    font-size: 0.6875rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    font-weight: 700;
+  }
+
+  .ask {
+    text-align: center;
+    font-family: "Zen Old Mincho", "Hiragino Mincho ProN", serif;
+    font-size: 1rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    color: var(--accent);
+    padding: 1.125rem 0.75rem;
+    border-top: 2px solid var(--accent);
+    border-bottom: 2px solid var(--accent);
+    line-height: 1.6;
+  }
+
+  #savebar {
+    position: fixed;
+    left: 50%;
+    bottom: 0;
+    transform: translate(-50%, 110%);
+    width: min(42rem, 100vw);
+    background: var(--paper);
+    border-top: 1px solid var(--rule);
+    box-shadow: 0 -6px 24px rgba(0, 0, 0, .12);
+    padding: 0.75rem 1.125rem calc(0.75rem + env(safe-area-inset-bottom, 0px));
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    transition: transform .24s cubic-bezier(.2, .8, .2, 1);
+    z-index: 40;
+  }
+
+  #savebar.on { transform: translate(-50%, 0); }
+
+  #savebar .msg {
+    flex: 1 1 auto;
+    font-size: 0.8125rem;
+    line-height: 1.55;
+    color: var(--ink-2);
+    min-width: 0;
+  }
+
+  #savebar .msg b { color: var(--ink); font-weight: 700; }
+
+  #savebar .acts { flex: none; display: flex; gap: 0.5rem; }
+
+  #savebar button {
+    font-family: "Zen Kaku Gothic New", sans-serif;
+    font-size: 0.8125rem;
+    font-weight: 700;
+    border-radius: 8px;
+    padding: 0.5rem 0.875rem;
+    line-height: 1.4;
+    cursor: pointer;
+    white-space: nowrap;
+    border: 1px solid var(--accent);
+    background: var(--accent);
+    color: var(--paper);
+  }
+
+  #savebar button.ghost {
+    background: transparent;
+    color: var(--accent);
+  }
+
+  #savebar button[disabled] { opacity: .55; cursor: default; }
+
+  #toast {
+    position: fixed;
+    left: 50%;
+    bottom: 1rem;
+    transform: translate(-50%, 130%);
+    width: min(37rem, calc(100vw - 1.5rem));
+    background: var(--ink);
+    color: var(--ground);
+    border-radius: 10px;
+    padding: 0.75rem 0.9375rem;
+    font-size: 0.8125rem;
+    line-height: 1.6;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, .3);
+    transition: transform .28s cubic-bezier(.2, .8, .2, 1);
+    z-index: 50;
+  }
+
+  #toast.on { transform: translate(-50%, 0); }
+
+  body.bar #toast.on { transform: translate(-50%, -4.25rem); }
+
+  #toast b { font-weight: 700; }
+
+  #toast input {
+    width: 100%;
+    margin-top: 0.5rem;
+    font-size: 0.8125rem;
+    font-family: inherit;
+    padding: 0.4375rem 0.5rem;
+    border-radius: 6px;
+    border: 1px solid var(--rule);
+    background: var(--paper);
+    color: var(--ink);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    #toast, #savebar, .rb, .dig { transition: none; }
+  }
+</style>
+
+<div class="wrap">
+
+  <header class="masthead">
+    <div class="dateline">{{DATELINE}}</div>
+    <h1>ニュース日報</h1>
+    <div class="period">
+      対象期間：{{PERIOD}}<br>
+      このページは毎朝7時ごろに最新版へ更新されます。
+    </div>
+  </header>
+
+  <section class="market" aria-label="市場データ">
+    <div class="market-head">
+      <span class="label">Market</span>
+      <span class="sub">直近の取引終了時点</span>
+    </div>
+    <ul class="market-list">
+{{MARKET_ROWS}}
+    </ul>
+    <div class="m-note">{{MARKET_NOTE}}</div>
+  </section>
+
+  <div class="howto">
+    <div><b>評価と深掘りの使い方</b><br>各記事の下の「興味あり／なし」を押すと下部に保存ボタンが出ます。保存した評価は翌朝の実行時に回収され、記事の選び方の見直しに使います。「深掘り」を押すと依頼文がコピーされるので、Claudeアプリに切り替えて新しい会話に貼り付けてください。日報の本文はプロジェクト「調べもの」にも保存してあるので、番号だけで話が通じます。</div>
+  </div>
+
+{{SECTIONS}}
+
+  <section class="closing">
+    <h2>掲載を見送った候補と注記</h2>
+    <p><span class="k">見送り</span><br>{{SKIPPED}}</p>
+    <p><span class="k">注記</span><br>{{NOTE}}</p>
+  </section>
+
+  <div class="ask">深掘りしたい番号を指定してください</div>
+
+</div>
+
+<div id="savebar" role="status" aria-live="polite">
+  <div class="msg"></div>
+  <div class="acts"></div>
+</div>
+
+<div id="toast" role="status" aria-live="polite"></div>
+
+<script>
+  (function () {
+    var MMDD = "{{MMDD}}";
+    var ISODATE = "{{ISODATE}}";
+    var LSKEY = "newsfb:" + ISODATE;
+    var DRIVE = "Google Drive";
+
+    var toast = document.getElementById('toast');
+    var bar = document.getElementById('savebar');
+    var barMsg = bar.querySelector('.msg');
+    var barActs = bar.querySelector('.acts');
+    var hideTimer = null;
+
+    var votes = {};
+    var savedSig = "";
+    var mcp = null;
+    var mcpResolved = false;
+
+    /* ---------- storage ---------- */
+    function load() {
+      try {
+        var raw = localStorage.getItem(LSKEY);
+        if (raw) {
+          var o = JSON.parse(raw);
+          votes = o.votes || {};
+          savedSig = o.savedSig || "";
+        }
+      } catch (e) { /* private mode etc. — run without persistence */ }
+    }
+
+    function persist() {
+      try {
+        localStorage.setItem(LSKEY, JSON.stringify({ votes: votes, savedSig: savedSig }));
+      } catch (e) { /* ignore */ }
+    }
+
+    function sig() {
+      var ks = Object.keys(votes).sort(function (a, b) { return (+a) - (+b); });
+      return ks.map(function (k) { return k + ':' + votes[k]; }).join(',');
+    }
+
+    function pending() { return sig() !== savedSig; }
+    function count() { return Object.keys(votes).length; }
+
+    /* ---------- toast ---------- */
+    function showToast(html, ms) {
+      toast.innerHTML = html;
+      toast.classList.add('on');
+      if (hideTimer) clearTimeout(hideTimer);
+      hideTimer = setTimeout(function () { toast.classList.remove('on'); }, ms || 9000);
+    }
+
+    /* ---------- clipboard (three-step fallback) ---------- */
+    function legacyCopy(text) {
+      try {
+        var ta = document.createElement('textarea');
+        ta.value = text;
+        ta.setAttribute('readonly', '');
+        ta.style.position = 'fixed';
+        ta.style.top = '-1000px';
+        document.body.appendChild(ta);
+        ta.select();
+        var ok = document.execCommand('copy');
+        document.body.removeChild(ta);
+        return ok;
+      } catch (e) { return false; }
+    }
+
+    function manualCopy(text, lead) {
+      showToast(lead + '自動コピーができませんでした。下の文面を長押しでコピーしてください。' +
+        '<input type="text" readonly value="' + text.replace(/"/g, '&quot;') + '">', 30000);
+      var inp = toast.querySelector('input');
+      if (inp) { inp.focus(); inp.select(); }
+    }
+
+    function copy(text, onOk, lead) {
+      try {
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(text).then(onOk, function () {
+            if (legacyCopy(text)) { onOk(); } else { manualCopy(text, lead); }
+          });
+          return;
+        }
+      } catch (e) { /* fall through */ }
+      if (legacyCopy(text)) { onOk(); } else { manualCopy(text, lead); }
+    }
+
+    /* ---------- deep dive ---------- */
+    function digPrompt(n, t) {
+      return 'ニュース日報 ' + MMDD + ' の' + n + '番「' + t + '」を深掘りして。元のまとめはプロジェクト「調べもの」の news-latest.md にあります。';
+    }
+
+    var digs = document.querySelectorAll('button.dig');
+    for (var i = 0; i < digs.length; i++) {
+      (function (b) {
+        b.addEventListener('click', function () {
+          var text = digPrompt(b.getAttribute('data-n'), b.getAttribute('data-t'));
+          copy(text, function () {
+            showToast('依頼文をコピーしました。<b>Claudeアプリに切り替えて</b>、新しい会話に貼り付けてください。', 12000);
+          }, '');
+        });
+      })(digs[i]);
+    }
+
+    /* ---------- rating ---------- */
+    function paint(n) {
+      var row = document.querySelector('.rate[data-n="' + n + '"]');
+      if (!row) return;
+      var bs = row.querySelectorAll('.rb');
+      for (var j = 0; j < bs.length; j++) {
+        bs[j].setAttribute('aria-pressed', votes[n] === bs[j].getAttribute('data-v') ? 'true' : 'false');
+      }
+    }
+
+    function setVote(n, v) {
+      if (votes[n] === v) { delete votes[n]; } else { votes[n] = v; }
+      persist();
+      paint(n);
+      renderBar();
+    }
+
+    var rates = document.querySelectorAll('.rate');
+    for (var k = 0; k < rates.length; k++) {
+      (function (row) {
+        var n = row.getAttribute('data-n');
+        var bs = row.querySelectorAll('.rb');
+        for (var j = 0; j < bs.length; j++) {
+          (function (b) {
+            b.addEventListener('click', function () { setVote(n, b.getAttribute('data-v')); });
+          })(bs[j]);
+        }
+      })(rates[k]);
+    }
+
+    /* ---------- save bar ---------- */
+    function setBar(on) {
+      bar.classList.toggle('on', !!on);
+      document.body.classList.toggle('bar', !!on);
+    }
+
+    function btn(label, cls, fn) {
+      var b = document.createElement('button');
+      b.textContent = label;
+      if (cls) b.className = cls;
+      b.addEventListener('click', fn);
+      return b;
+    }
+
+    function payloadText() {
+      var items = [];
+      var ks = Object.keys(votes).sort(function (a, b) { return (+a) - (+b); });
+      for (var i2 = 0; i2 < ks.length; i2++) {
+        var n = ks[i2];
+        var row = document.querySelector('.rate[data-n="' + n + '"]');
+        items.push({
+          n: Number(n),
+          v: votes[n],
+          title: row ? row.getAttribute('data-t') : '',
+          genre: row ? row.getAttribute('data-g') : ''
+        });
+      }
+      return JSON.stringify({ date: ISODATE, mmdd: MMDD, savedAt: new Date().toISOString(), items: items });
+    }
+
+    function summaryText() {
+      var yes = [], no = [];
+      var ks = Object.keys(votes).sort(function (a, b) { return (+a) - (+b); });
+      for (var i3 = 0; i3 < ks.length; i3++) {
+        (votes[ks[i3]] === 'yes' ? yes : no).push(ks[i3]);
+      }
+      return 'ニュース日報 ' + MMDD + ' の評価です。興味あり: ' +
+        (yes.length ? yes.join(', ') : 'なし') + ' / 興味なし: ' +
+        (no.length ? no.join(', ') : 'なし') + '。これを評価の記録に追記してください。';
+    }
+
+    function copyFallback() {
+      copy(summaryText(), function () {
+        showToast('評価をコピーしました。Claudeアプリに貼り付けて送ってください。', 12000);
+      }, '');
+    }
+
+    function renderBar() {
+      if (!pending()) {
+        if (count() > 0 && savedSig === sig()) {
+          barMsg.innerHTML = '<b>' + count() + '件</b>の評価を保存済みです。';
+          barActs.innerHTML = '';
+          setBar(true);
+          setTimeout(function () { if (!pending()) setBar(false); }, 2600);
+        } else {
+          setBar(false);
+        }
+        return;
+      }
+      barMsg.innerHTML = '<b>' + count() + '件</b>の評価が未保存です。';
+      barActs.innerHTML = '';
+      if (mcpResolved && !mcp) {
+        barActs.appendChild(btn('コピーする', 'ghost', copyFallback));
+      } else {
+        barActs.appendChild(btn('保存', '', save));
+      }
+      setBar(true);
+    }
+
+    function barError(msg, withRetry) {
+      barMsg.innerHTML = msg;
+      barActs.innerHTML = '';
+      if (withRetry) barActs.appendChild(btn('もう一度', '', save));
+      barActs.appendChild(btn('コピー', 'ghost', copyFallback));
+      setBar(true);
+    }
+
+    function save() {
+      if (!mcp) { copyFallback(); return; }
+      barMsg.innerHTML = '保存しています…';
+      barActs.innerHTML = '';
+      var b = btn('保存', '', save);
+      b.disabled = true;
+      barActs.appendChild(b);
+
+      mcp.callTool(DRIVE, 'create_file', {
+        title: 'news-feedback-' + ISODATE + '.json',
+        textContent: payloadText(),
+        contentMimeType: 'application/json',
+        disableConversionToGoogleType: true
+      }).then(function () {
+        savedSig = sig();
+        persist();
+        renderBar();
+      }, function (err) {
+        var code = (err && err.code) || 'upstream_error';
+        if (code === 'needs_reauth') {
+          barError('Google Driveの接続が切れています。claude.ai の設定 → コネクタ で再接続してください。', false);
+        } else if (code === 'server_not_connected' || code === 'selection_required') {
+          barError('Google Driveが接続されていません。claude.ai の設定 → コネクタ で追加してください。', false);
+        } else if (code === 'blocked_by_policy' || code === 'approval_required') {
+          barError('このページからのDriveへの保存が許可されていません。', false);
+        } else if (code === 'not_granted' || code === 'capability_disabled' || code === 'capability_removed') {
+          barError('この画面ではDriveへの保存を使えません。', false);
+        } else if (code === 'tool_error') {
+          barError('Driveが保存を拒否しました。' + ((err && err.message) ? '（' + err.message + '）' : ''), true);
+        } else if (code === 'cancelled') {
+          barError('保存を取り消しました。', true);
+        } else {
+          barError('保存できたか確認できませんでした。もう一度押すか、コピーして送ってください。', true);
+        }
+      });
+    }
+
+    /* ---------- boot ---------- */
+    load();
+    for (var m = 0; m < rates.length; m++) paint(rates[m].getAttribute('data-n'));
+    renderBar();
+
+    if (window.claude && window.claude.use) {
+      window.claude.use('mcp').then(function (ns) {
+        mcp = ns; mcpResolved = true; renderBar();
+      }, function () {
+        mcp = null; mcpResolved = true; renderBar();
+      });
+    } else {
+      mcpResolved = true;
+      renderBar();
+    }
+  })();
+</script>
