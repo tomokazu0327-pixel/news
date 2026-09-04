@@ -1,4 +1,52 @@
 <title>ニュース日報</title>
+<!--
+  ニュース日報テンプレート
+
+  毎朝の Routine「News」が raw.githubusercontent から curl で取得し、
+  render_news.py がプレースホルダを埋めて公開する。data.json の形式は
+  render_news.py 冒頭の docstring を参照。
+
+  ■ 変えてはいけないこと（いずれも実機で失敗した経緯がある）
+
+  1. .art h3 に text-wrap: balance を付けない
+     日本語だと「線状降水帯」のような一語の途中で改行されて読みにくい。
+     利用者から指摘があって外した。.masthead h1 だけは付けてよい。
+
+  2. 深掘りボタンを <a href> に戻さない
+     claude://code/new?q=... も https://claude.ai/code/new?q=... も、
+     アーティファクトが claude.ai 内の iframe で表示されるため遷移が
+     ブラウザにブロックされ、iPhone Safari で動かないことを確認済み。
+     以前置いていて反応しなかったので撤去した。復活させないこと。
+     現在の実装（クリップボードにコピー＋トースト）が正解。
+
+  3. 市場データを横並びの4列テーブルにしない
+     狭い画面で前日比が切れる。銘柄ごとに1行、右側に終値と前日比を
+     上下2段で右寄せするグリッド（.market-list li）を維持する。
+
+  4. ドル円に .up / .down を使わない
+     円安・円高は良し悪しが一義的でないため .flat（中間色）にし、
+     本文側に「（円高）」等の注記を添える運用。
+
+  5. Drive保存の disableConversionToGoogleType: true を外さない
+     外すと JSON が Google ドキュメントに変換され、翌朝の
+     download_file_content が評価データを読み取れなくなる。
+
+  ■ 壊れやすい前提
+
+  - {{ISODATE}} は localStorage キー（newsfb:YYYY-MM-DD）と
+    Drive のファイル名 news-feedback-YYYY-MM-DD.json の両方に使う。
+    未置換だと render_news.py が異常終了する。
+  - {{MMDD}} は深掘り依頼文と評価サマリの文面に入る。
+  - data-t（見出し）と data-g（ジャンル）は評価と一緒に Drive へ
+    保存される。render_news.py が付けるので手で消さない。
+  - Drive のエラーは code で分岐している。ひとまとめの「失敗しました」に
+    しない。どの分岐でも依頼文をコピーする逃げ道を残す。
+  - body には不透明な背景色（var(--ground)）を必ず指定する。
+  - 色はすべて CSS 変数で定義し、@media (prefers-color-scheme) と
+    [data-theme] の両方で切り替える。
+  - スマートフォンの縦画面が最優先。1カラム、本文幅 42rem、
+    横スクロールは発生させない。
+-->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Zen+Old+Mincho:wght@600;700;900&family=Zen+Kaku+Gothic+New:wght@400;500;700&family=Roboto+Mono:wght@400;500;700&display=swap">
