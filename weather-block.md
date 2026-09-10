@@ -10,8 +10,10 @@
 | 予報 | https://www.jma.go.jp/bosai/forecast/data/forecast/130000.json |
 | 警報 | https://www.jma.go.jp/bosai/warning/data/warning/130000.json |
 
-いずれも素のJSONで返る（JS描画ではない）。取得後は `weather-block.js` の
-`renderWeatherBlock(forecast, warning, todayYmd, nowHour)` に渡す。
+いずれも素のJSONで返る（JS描画ではない）。毎朝7時の実行時に取得し、
+data.json の `weather` キーに `{"forecast": ..., "warning": ...}` の形で
+そのまま格納する。加工は `weather_block.py` の
+`render_weather(weather, today, now_hour)` が行い、`(html, notes)` を返す。
 
 ## 抜き出す場所
 
@@ -100,6 +102,8 @@ Tablerでの有無が未確認のため使わない。
 | 注意報のみ（雷・強風） | 警報バンドなし |
 | 大雨警報＋洪水警報＋雷注意報＋波浪警報解除 | バンドに「大雨警報・洪水警報」 |
 | 予報も古い（5/28） | 天気ブロックごと省略して注記 |
+
+いずれも `render_news.py` + `news-daily-template.html` の通しで出力を確認済み。
 
 ## 未確認
 

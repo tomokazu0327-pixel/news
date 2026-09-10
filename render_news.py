@@ -37,6 +37,8 @@ import html
 import json
 import sys
 
+from weather_block import render_weather
+
 
 def esc(s):
     return html.escape(str(s), quote=True)
@@ -120,19 +122,25 @@ def main():
         tpl = f.read()
 
     market = d.get("market", {})
+    weather_html, weather_notes = render_weather(
+        d.get("weather"), d.get("isodate"), 7)
+    note = d.get("note", "")
+    if weather_notes:
+        note = (note + " " if note else "") + " ".join(weather_notes)
     page = (
         tpl.replace("{{DATELINE}}", esc(d["dateline"]))
         .replace("{{PERIOD}}", esc(d["period"]))
+        .replace("{{WEATHER}}", weather_html)
         .replace("{{MARKET_ROWS}}", render_market(market))
         .replace("{{MARKET_NOTE}}", esc(market.get("note", "")))
         .replace("{{SECTIONS}}", render_sections(d.get("genres", [])))
         .replace("{{SKIPPED}}", esc(d.get("skipped", "")))
-        .replace("{{NOTE}}", esc(d.get("note", "")))
+        .replace("{{NOTE}}", esc(note))
         .replace("{{MMDD}}", esc(d["mmdd"]))
         .replace("{{ISODATE}}", esc(d["isodate"]))
     )
 
-    leftover = [m for m in ("{{DATELINE}}", "{{PERIOD}}", "{{MARKET_ROWS}}",
+    leftover = [m for m in ("{{DATELINE}}", "{{PERIOD}}", "{{WEATHER}}", "{{MARKET_ROWS}}",
                             "{{MARKET_NOTE}}", "{{SECTIONS}}", "{{SKIPPED}}",
                             "{{NOTE}}", "{{MMDD}}", "{{ISODATE}}") if m in page]
     if leftover:
