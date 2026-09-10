@@ -110,3 +110,47 @@ Tablerでの有無が未確認のため使わない。
 - 朝7時の時点で当日5時発表が反映されるか。翌日の実行で実測する。
 - 警報バンドに市区町村（例：23区東部）まで出すか。出す場合は
   `areaTypes[1]` の市区町村コードが必要（江東区=1310800は推定、未確認）。
+
+
+---
+
+# マーケット先頭のマネックス総資産
+
+市場データの一番上に、証券口座の総資産と前日比を1行入れる。
+
+## 取得
+
+`get-portfolio-product-type-history` を
+`historyGranularity=daily` / `portfolioAccountScope=securitiesGeneralAndNisa` /
+`pageSize=2` / `enumMode=omit` で1回だけ呼ぶ。
+`data[0]` が最新営業日、`data[1]` がその前営業日。
+
+- 総資産 … `data[0].totalAmountInJpy`
+- 前日比 … `data[0].totalAmountInJpy - data[1].totalAmountInJpy`
+- 率 … 前日比 ÷ `data[1].totalAmountInJpy`
+- 日付 … `data[0].date`
+
+`get-account-summary` の `totalMarketValueInJpy` は `data[0].totalAmountInJpy`
+と一致する（2026-09-11に実測）。総資産だけなら口座サマリーでも取れるが、
+前日比のために履歴が要るので履歴の1回呼び出しに寄せる。
+
+朝7時の時点で最新 snapshot は前営業日ぶん。市場データの「前日大引け」と
+時点がそろう。
+
+## data.json への入れ方
+
+`market.rows` の先頭に置き、`kind` に `own` を付ける。
+
+```
+{"name":"マネックス証券 総資産","when":"9/10時点","close":"72,331,471円",
+ "chg":"−174,092（−0.24%）","dir":"down","kind":"own"}
+```
+
+- `dir` は増で `up`、減で `down`、変化なしで `flat`
+- マイナス記号は既存行と同じ全角の `−` を使う
+- `kind":"own"` の行は背景が `--accent-wash`、銘柄名が `--accent` になる
+
+## 取得できなかったとき
+
+行ごと落とす。前日比だけ出せない場合は `chg` を空文字にして
+`dir` を `flat` にする。推定値を書かない。

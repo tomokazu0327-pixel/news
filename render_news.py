@@ -47,8 +47,9 @@ def esc(s):
 def render_market(market):
     rows = []
     for r in market.get("rows", []):
+        cls = ' class="own"' if r.get("kind") == "own" else ""
         rows.append(
-            '      <li>\n'
+            f'      <li{cls}>\n'
             '        <div>\n'
             f'          <div class="m-name">{esc(r["name"])}</div>\n'
             f'          <span class="m-when">{esc(r["when"])}</span>\n'
