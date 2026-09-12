@@ -2,9 +2,11 @@
 <!--
   ニュース日報テンプレート
 
-  毎朝の Routine「News」が raw.githubusercontent から curl で取得し、
-  render_news.py がプレースホルダを埋めて公開する。data.json の形式は
-  render_news.py 冒頭の docstring を参照。
+  毎朝の Routine「ニュース日報 毎朝7時JST」が、リポジトリ
+  tomokazu0327-pixel/news のクローン（無ければ Drive の Claude/News
+  フォルダ）から取得し、render_news.py がプレースホルダを埋めて公開する。
+  raw.githubusercontent への curl は定期実行のネットワークで403になるため
+  使わない。data.json の形式は render_news.py 冒頭の docstring を参照。
 
   ■ 変えてはいけないこと（いずれも実機で失敗した経緯がある）
 
