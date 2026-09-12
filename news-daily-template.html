@@ -41,6 +41,8 @@
     保存される。render_news.py が付けるので手で消さない。
   - Drive のエラーは code で分岐している。ひとまとめの「失敗しました」に
     しない。どの分岐でも依頼文をコピーする逃げ道を残す。
+  - 評価の保存先は parentId で Claude/News フォルダに固定している。
+    外すとマイドライブ直下に出る（2026-09-12 まで実際にそうなっていた）。
   - body には不透明な背景色（var(--ground)）を必ず指定する。
   - 色はすべて CSS 変数で定義し、@media (prefers-color-scheme) と
     [data-theme] の両方で切り替える。
@@ -952,6 +954,7 @@
         title: 'news-feedback-' + ISODATE + '.json',
         textContent: payloadText(),
         contentMimeType: 'application/json',
+        parentId: '1CKFUi02gAFjJCiLbVIRT9nVHfkOtViQe',
         disableConversionToGoogleType: true
       }).then(function () {
         savedSig = sig();
