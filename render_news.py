@@ -19,7 +19,7 @@ data.json の形:
   },
   "genres": [
     {"mark":"①","name":"国内・政治・社会","genre_key":"国内・政治・社会",
-     "items":[{"title":"...","body":"...","why":"...","src":"NHK（8/25）"}]},
+     "items":[{"title":"...","body":"...","src":"NHK（8/25）"}]},
     {"mark":"③","name":"健康・医療","genre_key":"健康・医療","items":[],
      "empty_note":"本日は該当なし。"}
   ],
@@ -90,8 +90,6 @@ def render_sections(genres):
                 f'      <div class="num">{n}</div>\n'
                 f'      <h3>{esc(title)}</h3>\n'
                 f'      <p class="body">{esc(it["body"])}</p>\n'
-                '      <div class="why"><span class="label">なぜ重要か</span>'
-                f'<p>{esc(it["why"])}</p></div>\n'
                 '      <div class="foot">'
                 f'<span class="src">{esc(it["src"])}</span>'
                 f'<button type="button" class="dig" data-n="{n}" data-t="{esc(title)}">深掘り</button>'
