@@ -99,6 +99,46 @@ def _pop_fill(pop):
     return "color-mix(in srgb, var(--accent-2) %d%%, transparent)" % n
 
 
+def _wear(tmax, tmin, pops, wind):
+    """最高気温を基準に服装の目安を1行で返す。気温の区切りは一般的な目安で、公的な基準ではない。"""
+    try:
+        t = int(tmax)
+    except (TypeError, ValueError):
+        return ""
+    if t >= 30:
+        base = "半袖。日差しと暑さへの対策を"
+    elif t >= 25:
+        base = "半袖"
+    elif t >= 21:
+        base = "長袖シャツ1枚"
+    elif t >= 16:
+        base = "長袖に薄手の上着（カーディガン・ジャケット）"
+    elif t >= 12:
+        base = "セーターや厚手のジャケット"
+    elif t >= 8:
+        base = "コート"
+    else:
+        base = "厚手のコートに手袋・マフラー"
+    parts = [base]
+    try:
+        lo = int(tmin)
+    except (TypeError, ValueError):
+        lo = None
+    if lo is not None and t - lo >= 8 and lo <= 18:
+        if t >= 21:
+            parts.append("朝は%d°まで下がるので羽織るものを" % lo)
+        else:
+            parts.append("朝は%d°まで下がる" % lo)
+    if wind and "強く" in wind:
+        parts.append("風が強く体感は低め")
+    top = max((v for _, v in pops), default=0)
+    if top >= 50:
+        parts.append("傘を持って出かける")
+    elif top >= 30:
+        parts.append("折りたたみ傘があると安心")
+    return "。".join(parts) + "。"
+
+
 def _find_area(series, name):
     for a in series.get("areas", []):
         if a.get("area", {}).get("name") == name:
@@ -175,6 +215,8 @@ def render_weather(weather, today=None, now_hour=7):
 
     f_area = _find_area(ts[0], AREA_FORECAST)
     text = _tidy(f_area["weathers"][idx])
+    winds = f_area.get("winds") or []
+    wind = _tidy(winds[idx]) if idx < len(winds) else ""
     kind = _pick_icon(f_area["weatherCodes"][idx], text)
 
     t_area = _find_area(ts[2], AREA_TEMP)
@@ -225,6 +267,12 @@ def render_weather(weather, today=None, now_hour=7):
         )
         pop_html = '    <ul class="w-pops">%s</ul>\n' % cells
 
+    wear = _wear(tmax, tmin, pops, wind)
+    wear_html = (
+        '    <div class="w-wear"><span class="w-wear-label">服装</span>'
+        '<span class="w-wear-text">%s</span></div>\n' % esc(wear)
+    ) if wear else ""
+
     body = (
         '  <section class="weather" aria-label="天気">\n'
         '    <div class="w-head"><span class="label">Weather</span>'
@@ -238,6 +286,7 @@ def render_weather(weather, today=None, now_hour=7):
         % (esc(tmax) if tmax is not None else "—", esc(tmin) if tmin is not None else "—")
         + '    </div>\n'
         + pop_html
+        + wear_html
         + '  </section>'
     )
     return body, notes
