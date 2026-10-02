@@ -44,6 +44,14 @@ def esc(s):
     return html.escape(str(s), quote=True)
 
 
+def period_text(period):
+    """対象期間は日付の範囲だけを出す。④の期間などの補足は付けない（2026-10-03 利用者の指示）。"""
+    p = str(period).strip()
+    if p.startswith("対象期間："):
+        p = p[len("対象期間："):]
+    return p.split("。")[0].strip()
+
+
 def render_market(market):
     rows = []
     for r in market.get("rows", []):
@@ -128,7 +136,7 @@ def main():
         note = (note + " " if note else "") + " ".join(weather_notes)
     page = (
         tpl.replace("{{DATELINE}}", esc(d["dateline"]))
-        .replace("{{PERIOD}}", esc(d["period"]))
+        .replace("{{PERIOD}}", esc(period_text(d["period"])))
         .replace("{{WEATHER}}", weather_html)
         .replace("{{MARKET_ROWS}}", render_market(market))
         .replace("{{MARKET_NOTE}}", esc(market.get("note", "")))
