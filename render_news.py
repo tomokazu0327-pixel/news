@@ -45,11 +45,14 @@ def esc(s):
 
 
 def period_text(period):
-    """対象期間は日付の範囲だけを出す。④の期間などの補足は付けない（2026-10-03 利用者の指示）。"""
+    """対象期間は日付の範囲だけを出す。「日本時間」や④の期間などの補足は付けない（2026-10-03 利用者の指示）。"""
     p = str(period).strip()
     if p.startswith("対象期間："):
         p = p[len("対象期間："):]
-    return p.split("。")[0].strip()
+    p = p.split("。")[0]
+    for s in ("（日本時間）", "(日本時間)", "日本時間"):
+        p = p.replace(s, "")
+    return p.strip()
 
 
 def render_market(market):
