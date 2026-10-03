@@ -7,9 +7,14 @@ render_news.py から使う。data.json の "weather" キーに、気象庁の
 {
   "weather": {
     "forecast": [ ... forecast/130000.json の中身 ... ],
-    "warning":  { ... warning/130000.json の中身 ... }
+    "warning":  { ... warning/130000.json の中身 ... },
+    "temps":    {"max": 26, "min": 19, "src": "tenki.jp"}   # 任意
   }
 }
+
+temps は気象庁以外のサイトで取った当日の最高・最低気温。あれば気象庁の
+値より優先する。無ければ気象庁の値を使い、最低が最高と同じ値（5時発表）
+なら最低は「—」にする。
 
 render_weather() は (html, notes) を返す。notes は空リストのことも
 ある。中身があるときは日報末尾の注記に足す。
@@ -187,6 +192,19 @@ def _render_alert(warning, today):
     )
 
 
+def _temp_value(v):
+    """気温の値を int にする。数でない・ありえない値は None。"""
+    try:
+        t = int(round(float(str(v).replace("℃", "").replace("°", "").strip())))
+    except (TypeError, ValueError):
+        return None
+    return t if -20 <= t <= 45 else None
+
+
+def _deg(v):
+    return esc(v) + "°" if v is not None else "—"
+
+
 def render_weather(weather, today=None, now_hour=7):
     """(html, notes) を返す。表示しない場合 html は空文字。"""
     notes = []
@@ -228,6 +246,19 @@ def render_weather(weather, today=None, now_hour=7):
             tmin = t_area["temps"][i]
         if _hour(t) == 9:
             tmax = t_area["temps"][i]
+
+    # 5時発表の当日分は最低気温の欄に最高気温と同じ値が入る（朝の最低は発表済みのため）。
+    # 同じ値なら最低は不明として扱う。
+    if tmin is not None and tmax is not None and str(tmin) == str(tmax):
+        tmin = None
+
+    # 気象庁以外のサイトから取った当日の最高・最低があれば、そちらを使う
+    temp_src = ""
+    ext = weather.get("temps") or {}
+    e_max, e_min = _temp_value(ext.get("max")), _temp_value(ext.get("min"))
+    if e_max is not None and (e_min is None or e_min <= e_max):
+        tmax, tmin = e_max, e_min
+        temp_src = str(ext.get("src") or "").strip()
 
     p_area = _find_area(ts[1], AREA_FORECAST)
     pops = []
@@ -276,14 +307,15 @@ def render_weather(weather, today=None, now_hour=7):
     body = (
         '  <section class="weather" aria-label="天気">\n'
         '    <div class="w-head"><span class="label">Weather</span>'
-        '<span class="sub">気象庁 %s</span></div>\n' % esc(_label(report))
+        '<span class="sub">気象庁 %s%s</span></div>\n'
+        % (esc(_label(report)), (" ／ 気温 " + esc(temp_src)) if temp_src else "")
         + alert_html
         + '    <div class="w-main">%s\n' % _svg(kind)
         + '      <div class="w-text"><div class="w-desc">%s</div>%s</div>\n'
         % (esc(text), ('<div class="w-sub">%s</div>' % esc(sub)) if sub else "")
-        + '      <div class="w-temp"><span class="w-max">%s°</span>'
-        '<span class="w-min">/ %s°</span></div>\n'
-        % (esc(tmax) if tmax is not None else "—", esc(tmin) if tmin is not None else "—")
+        + '      <div class="w-temp"><span class="w-max">%s</span>'
+        '<span class="w-min">/ %s</span></div>\n'
+        % (_deg(tmax), _deg(tmin))
         + '    </div>\n'
         + pop_html
         + wear_html

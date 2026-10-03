@@ -59,11 +59,14 @@ def render_market(market):
     rows = []
     for r in market.get("rows", []):
         cls = ' class="own"' if r.get("kind") == "own" else ""
+        # ドル円は集計時点の値なので時刻を出さない（利用者の指示、2026-10-03）
+        when = "" if r["name"] == "ドル円" else r.get("when", "")
+        when_html = f'          <span class="m-when">{esc(when)}</span>\n' if when else ""
         rows.append(
             f'      <li{cls}>\n'
             '        <div>\n'
             f'          <div class="m-name">{esc(r["name"])}</div>\n'
-            f'          <span class="m-when">{esc(r["when"])}</span>\n'
+            + when_html +
             '        </div>\n'
             '        <div class="m-vals">\n'
             f'          <span class="m-close">{esc(r["close"])}</span>\n'
